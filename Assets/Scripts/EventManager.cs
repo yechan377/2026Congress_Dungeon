@@ -3,10 +3,11 @@ using UnityEngine;
 
 public enum EventType
 {
-    
+    OnPlayerDead,
+    OnEnemyDead,
 }
 
-public class EventManager : MonoBehaviour
+public class EventManager : SingletonManagers<EventManager>
 {
     public delegate void OnEvent(EventType type, Component sender, params object[] args);
 
@@ -31,7 +32,7 @@ public class EventManager : MonoBehaviour
         listeners[type].Remove(callback);
     }
 
-    public void Notification(EventType type, Component sender, params Object[] args)
+    public void Notification(EventType type, Component sender, params object[] args)
     {
         if (!listeners.ContainsKey(type)) return;
 

@@ -2,29 +2,50 @@ using UnityEngine;
 
 public class BattleManager : SingletonManagers<BattleManager>
 {
-    private PlayerData currentPlayer;
-    private EnemyData currentEnemy;
+    public PlayerData CurrentPlayer { get; private set; }
+    public EnemyData CurrentEnemy { get; private set; }
+    private IBattleState currentState;
+    private IBattleState playerTurn = new PlayerTurnState();
+    private IBattleState enemyTurn = new EnemyTurnState();
+    private IBattleState victory = new VictoryState();
+    private IBattleState defeat = new DefeatState();
 
     public void StartBattle(PlayerData player, EnemyData enemy)
     {
-        currentPlayer = player;
-        currentEnemy = enemy;
-        Debug.Log($"전투 시작! 플레이어 HP: {player.HP}, 적: {enemy.HP}");
+        CurrentPlayer = player;
+        CurrentEnemy = enemy;
+        Debug.Log($"전투 시작 Player: {CurrentPlayer}, Enemy: {CurrentEnemy}");
+        ChangeState(CurrentPlayer.Speed > CurrentEnemy.Speed ? playerTurn : enemyTurn);
     }
 
-    public void CheckDeath(Character character)
+    public void ChangeState(IBattleState state)
     {
-        if (character is PlayerData playerData) PlayerDead();
-        if (character is EnemyData enemyData) EnemyDead(enemyData);
+        currentState?.Exit(this);
+        currentState = state;
+        currentState.Enter(this);
     }
 
-    public void PlayerDead()
+    public void Attack(Character target, int damage)
     {
-        EventManager.Instance.Notification(EventType.OnPlayerDead, this);
+        target.TakeDamage(damage);
+        CheckBattleEnd();
     }
 
-    public void EnemyDead(EnemyData enemyData)
+    public void OnPlayerSelectSkill(/*Skill skill*/)
     {
-        EventManager.Instance.Notification(EventType.OnEnemyDead, this, enemyData);
+        if (!(currentState is PlayerTurnState)) return; // 자기 턴 아니면 무시
+
+        //int damage = skill.CalculateDamage(currentPlayer);
+        //currentEnemy.TakeDamage(damage);
+        CheckBattleEnd();
+    }
+
+    public void CheckBattleEnd()
+    {
+        if (CurrentEnemy.IsDead()) { ChangeState(victory); return; }
+        if (CurrentPlayer.IsDead()) { ChangeState(defeat); return; }
+
+        // 턴 교대
+        ChangeState(currentState is PlayerTurnState ? new EnemyTurnState() : new PlayerTurnState());
     }
 }

@@ -7,10 +7,7 @@ public class Character
     {
         bool wasAlive = !IsDead();
         HP = Mathf.Max(0, HP - amount);
-        if (wasAlive && IsDead())
-        {
-            BattleManager.Instance.CheckDeath(this);
-        }
+        EventManager.Instance.Notification(EventType.OnHpChanged, null, this);
     }
     public bool IsDead() => HP <= 0;
 }

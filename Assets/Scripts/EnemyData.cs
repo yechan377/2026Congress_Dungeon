@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class EnemyData : Character
 {
-    public int expReward;
-    public bool isBoss;
+    public int ExpReward;
+    public bool IsBoss;
 
     public void SetStats(int level, EnemyStat stat)
     {
@@ -13,7 +13,7 @@ public class EnemyData : Character
         Damage = stat.baseDamage + level * stat.damagePerLevel;
         Defence = stat.defence;
         Speed = stat.speed;
-        expReward = stat.expReward;
-        isBoss = stat.isBoss;
+        ExpReward = stat.expReward;
+        IsBoss = stat.isBoss;
     }
 }

@@ -5,6 +5,11 @@ public enum EventType
 {
     OnPlayerDead,
     OnEnemyDead,
+    OnHpChanged,
+    OnMpChanged,
+    OnGoldChanged,
+    OnExpChanged,
+    OnLevelUp,
 }
 
 public class EventManager : SingletonManagers<EventManager>

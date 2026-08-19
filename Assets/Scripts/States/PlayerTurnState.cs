@@ -9,6 +9,6 @@ public class PlayerTurnState : IBattleState
 
     public void Exit(BattleManager state) 
     {
-        
+        BattleManager.Instance.OnPlayerAction();
     }
 }

@@ -3,18 +3,29 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : SingletonManagers<GameManager>
 {
-    private void Awake()
+    public PlayerData CurrentPlayer { get; private set; }
+
+    public void InitNewGame()
     {
-        EventManager.Instance.AddListener(EventType.OnEnemyDead, OnEnemyDead);
+        CurrentPlayer = new PlayerData();
+
+        if (CurrentPlayer == null) CurrentPlayer = new PlayerData();
     }
 
-    private void OnEnemyDead(EventType type, Component sender, params object[] args)
+    public void SetPlayer(PlayerData player)
+    {
+        CurrentPlayer = player;
+    }
+
+    public void Victory()
     {
         Debug.Log("½Â¸®");
+        SceneManager.LoadScene("MenuScene");
     }
 
     public void StartGame()
     {
+        InitNewGame();
         SceneManager.LoadScene("StageScene");
     }
 

@@ -1,14 +1,20 @@
-using UnityEngine;
-
 public class EnemyTurnState : IBattleState
 {
     public void Enter(BattleManager state)
     {
-        Debug.Log("Àû ÅÏ");
-        int damage = state.CurrentEnemy.GetAttackDamage();
-        state.CurrentPlayer.TakeDamage(damage);
+        foreach (var enemy in state.EnemySlot)
+        {
+            if (enemy.IsDead()) continue;
+            state.CurrentPlayer.TakeDamage(10);
+
+            if (state.CurrentPlayer.IsDead()) break;
+        }
+
         state.CheckBattleEnd();
     }
 
-    public void Exit(BattleManager state) { }
+    public void Exit(BattleManager state)
+    {
+        BattleManager.Instance.OnEnemyAction();
+    }
 }

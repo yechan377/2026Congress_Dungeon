@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStat
   enemyName: stagemon1
   baseHp: 50
-  hpPerLevel: 0
+  hpPerLevel: 10
   baseDamage: 8
-  damagePerLevel: 0
+  damagePerLevel: 2
   defence: 0
   speed: 8
   expReward: 20
+  isBoss: 0

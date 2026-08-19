@@ -9,33 +9,20 @@ public class EnemyView : MonoBehaviour
 
     private EnemyData data;
 
-    private void OnEnable()
-    {
-        EventManager.Instance.AddListener(EventType.OnHpChanged, OnHpChanged);
-    }
-
-    private void OnDisable()
-    {
-        EventManager.Instance.RemoveListener(EventType.OnHpChanged, OnHpChanged);
-    }
-
-    private void OnHpChanged(EventType type, Component sender, params object[] args)
-    {
-        Character changed = (Character)args[0];
-        if (changed != data) return;
-
-        RefreshUI();
-    }
-
     public void Setup(EnemyData enemyData)
     {
         data = enemyData;
-        RefreshUI();
+        data.OnStatChanged += RefreshUI;
+        RefreshUI(data);
     }
 
-    public void RefreshUI()
+    private void OnDestroy()
     {
-        if (data == null) return;
+        if (data != null) data.OnStatChanged -= RefreshUI;
+    }
+
+    private void RefreshUI(Character character)
+    {
         hpBar.maxValue = data.MaxHP;
         hpBar.value = data.HP;
         hpText.text = $"{data.HP}/{data.MaxHP}";

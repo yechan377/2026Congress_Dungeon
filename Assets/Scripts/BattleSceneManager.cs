@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BattleSceneManager : MonoBehaviour
@@ -5,20 +6,33 @@ public class BattleSceneManager : MonoBehaviour
     [SerializeField] private EnemyStat testEnemyStat;
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private GameObject playerPrefab;
-    [SerializeField] private Transform enemySpawnPoint;
+    [SerializeField] private Transform[] enemySpawnPoints;
     [SerializeField] private Transform playerSpawnPoint;
 
     private void Start()
     {
-        PlayerData player = new PlayerData();
-        EnemyData enemy = EnemyFactory.Create(testEnemyStat, level: 1);
+        PlayerData player = GameManager.Instance.CurrentPlayer;
+        if (player == null)
+        {
+            player = new PlayerData();
+            GameManager.Instance.SetPlayer(player);
+        }
+        List<EnemyData> enemies = new() {
+            EnemyFactory.Create(testEnemyStat, Random.Range(1, 4)),
+            EnemyFactory.Create(testEnemyStat, Random.Range(1, 4))
+        };
 
-        GameObject enemyObj = Instantiate(enemyPrefab, enemySpawnPoint.position, Quaternion.identity);
         GameObject playerObj = Instantiate(playerPrefab, playerSpawnPoint.position, Quaternion.identity);
-
-        enemyObj.GetComponent<EnemyView>().Setup(enemy);
         playerObj.GetComponent<PlayerView>().Setup(player);
+        FindFirstObjectByType<PlayerUI>().Setup(player);
 
-        BattleManager.Instance.StartBattle(player, enemy);
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Transform spawnPoint = enemySpawnPoints[i];
+            GameObject enemyObj = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+            enemyObj.GetComponent<EnemyView>().Setup(enemies[i]);
+        }
+
+        BattleManager.Instance.StartBattle(player, enemies);
     }
 }

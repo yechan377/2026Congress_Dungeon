@@ -8,24 +8,39 @@ public class PlayerData : Character
     private int mp;
     private int critChance;
     private int dodgeChance;
+    private int weaponDamage;
+    private int armorDefence;
     public PlayerSkill[] EquippedSkills = new PlayerSkill[4];
     public List<PlayerSkill> LearnedSkills = new();
+    public Dictionary<Potion, int> Potions = new();
+    public Weapon EquippedWeapon;
+    public List<Weapon> OwnedWeapons = new();
+    public Armor EquippedArmor;
+    public List<Armor> OwnedArmors = new();
     public int Exp => exp;
     public int Gold => gold;
     public int MaxMP => maxMp;
     public int MP => mp;
     public int CritChance => critChance;
     public int DodgeChance => dodgeChance;
-    public int CritBonus;
-    public int CritBonusTurn;
 
     private const int MAX_LEVEL = 10;
 
     public PlayerData()
     {
         ResetPlayerStats();
+        InitPotions();
         EquipSkill(0, new SlashSkill());
         EquipSkill(1, new CleaveSkill());
+    }
+
+    private void InitPotions()
+    {
+        Potions[new RedPotion()] = 5;
+        Potions[new BluePotion()] = 5;
+        Potions[new StrengthPotion()] = 1;
+        Potions[new ManaPotion()] = 1;
+        Potions[new DodgePotion()] = 1;
     }
 
     public void ResetPlayerStats()
@@ -71,7 +86,7 @@ public class PlayerData : Character
     {
         Level += 1;
         MaxHP += 20;
-        HP = Mathf.Min(MaxHP, HP + 10);
+        Heal(10);
         maxMp += 10;
         mp = maxMp;
         Damage += 10;
@@ -86,6 +101,82 @@ public class PlayerData : Character
         EquippedSkills[slotIndex] = skill;
     }
 
+    public bool TryUsePotion(Potion potion)
+    {
+        if (!Potions.ContainsKey(potion) || Potions[potion] <= 0) return false;
+        Potions[potion]--;
+        potion.Use(this);
+        return true;
+    }
+
+    public void AddPotion(Potion potion, int amount)
+    {
+        if (!Potions.ContainsKey(potion)) return;
+        Potions[potion] = Mathf.Min(potion.MaxStack, Potions[potion] + amount);
+    }
+
+    public void AddWeapon(Weapon weapon)
+    {
+        OwnedWeapons.Add(weapon);
+    }
+
+    public void AddArmor(Armor armor)
+    {
+        OwnedArmors.Add(armor);
+    }
+
+    public void EquipWeapon(Weapon weapon)
+    {
+        EquippedWeapon = weapon;
+        weaponDamage = weapon.AttackBonus;
+    }
+
+    public void UnequipWeapon()
+    {
+        EquippedWeapon = null;
+        weaponDamage = 0;
+    }
+
+    public void EquipArmor(Armor armor)
+    {
+        EquippedArmor = armor;
+        armorDefence = armor.DefenceBonus;
+    }
+
+    public void UnequipArmor()
+    {
+        EquippedArmor = null;
+        armorDefence = 0;
+    }
+
+    public int GetDamage(float mult)
+    {
+        return Mathf.RoundToInt((Damage + AttackBonus + weaponDamage) * mult * GetCri());
+    }
+
+    public int GetCri()
+    {
+        return Random.Range(0, 101) < CritChance + CritBonus ? 2 : 1;
+    }
+
+    public void UseMp(int mpcost)
+    {
+        mp = Mathf.Max(0, mp - Mathf.RoundToInt( mpcost - mpcost * MpCostReduction));
+        OnStatChanged?.Invoke(this);
+    }
+
+    public void FillMp(int amount)
+    {
+        mp = Mathf.Min(MaxMP, mp + amount);
+        OnStatChanged?.Invoke(this);
+    }
+
+    public void Heal(int amount)
+    {
+        HP = Mathf.Min(MaxHP, HP + amount);
+        OnStatChanged?.Invoke(this);
+    }
+
     public void OnTurnEnd()
     {
         foreach (var skill in EquippedSkills)
@@ -93,13 +184,8 @@ public class PlayerData : Character
             skill?.ReduceCooldown();
         }
         ReduceBuffTurns();
-    }
-
-    public void ReduceBuffTurns()
-    {
-        if (CritBonusTurn == 0) return;
-        CritBonusTurn -= 1;
-        if (CritBonusTurn == 0) CritBonus = 0;
+        mp = Mathf.Min(MaxMP, mp + 10);
+        OnStatChanged?.Invoke(this);
     }
 
     private void LearnSkills(int level)

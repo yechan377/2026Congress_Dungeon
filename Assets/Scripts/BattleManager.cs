@@ -34,17 +34,30 @@ public class BattleManager : SingletonManagers<BattleManager>
     public void OnPlayerUseSkill(PlayerSkill skill)
     {
         if (!(currentState is PlayerTurnState)) return;
-        if (!skill.CanUse(CurrentPlayer))
+        if (!skill.CanUse(CurrentPlayer)) return;
+
+        if (!skill.RequiresTarget)
         {
-            Debug.Log("MP 부족 또는 쿨타임");
+            UseSkillOnTarget(skill, CurrentPlayer);
             return;
         }
 
-        EnemyData target = GetFirstAliveEnemy();
-        if (target == null) return;
+        List<EnemyData> aliveEnemies = GetAliveEnemies();
+        if (aliveEnemies.Count == 0) return;
 
+        if (aliveEnemies.Count > 1)
+        {
+            FindFirstObjectByType<TargetSelectUI>().Show(aliveEnemies, skill);
+            return;
+        }
+
+        UseSkillOnTarget(skill, aliveEnemies[0]);
+    }
+
+    public void UseSkillOnTarget(PlayerSkill skill, Character target)
+    {
         skill.Execute(CurrentPlayer, target);
-        Debug.Log($"{skill}사용");
+        CurrentPlayer.UseMp(skill.MpCost);
         CheckBattleEnd();
     }
 
@@ -57,13 +70,14 @@ public class BattleManager : SingletonManagers<BattleManager>
         return true;
     }
 
-    public EnemyData GetFirstAliveEnemy()
+    public List<EnemyData> GetAliveEnemies()
     {
+        List<EnemyData> result = new();
         foreach (var enemy in EnemySlot)
         {
-            if (!enemy.IsDead()) return enemy;
+            if (!enemy.IsDead()) result.Add(enemy);
         }
-        return null;
+        return result;
     }
 
     public void OnPlayerAction()
@@ -81,9 +95,16 @@ public class BattleManager : SingletonManagers<BattleManager>
         twoAction = true;
     }
 
+    public void OnPlayerPassTurn()
+    {
+        if (!(currentState is PlayerTurnState)) return;
+
+        CheckBattleEnd();
+    }
+
     public void CheckBattleEnd()
     {
-        if (AllEnemiesDead()) { ChangeState(victory); return; }
+        if (AllEnemiesDead()) { CurrentPlayer.FillMp(CurrentPlayer.MaxMP); ChangeState(victory); return; }
         if (CurrentPlayer.IsDead()) { ChangeState(defeat); return; }
         if (currentState is EnemyTurnState) { ChangeState(playerTurn); }
         else
@@ -94,7 +115,6 @@ public class BattleManager : SingletonManagers<BattleManager>
 
         if (playerAction && enemyAction)
         {
-            Debug.Log("턴 종료");
             CurrentPlayer.OnTurnEnd();
             playerAction = false;
             enemyAction = false;

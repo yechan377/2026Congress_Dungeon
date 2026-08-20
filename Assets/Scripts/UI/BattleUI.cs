@@ -46,6 +46,7 @@ public class BattleUI : MonoBehaviour
         for (int i = 0; i < skillButtons.Length; i++)
         {
             int slotIndex = i;
+            skillButtons[i].onClick.RemoveAllListeners();
             skillButtons[i].onClick.AddListener(() => OnClickSkillButton(slotIndex));
         }
     }

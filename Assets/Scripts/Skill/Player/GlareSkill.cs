@@ -7,11 +7,12 @@ public class GlareSkill : PlayerSkill
         SkillName = "Glare";
         MpCost = 25;
         Cooldown = 0;
+        RequiresTarget = false;
     }
 
     public override void Execute(PlayerData caster, Character target)
     {
         caster.CritBonus = 25;
-        caster.CritBonusTurn = 3;
+        caster.CritBonusTurns = 3;
     }
 }

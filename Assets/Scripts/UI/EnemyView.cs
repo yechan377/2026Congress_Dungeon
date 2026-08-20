@@ -11,6 +11,7 @@ public class EnemyView : MonoBehaviour
 
     public void Setup(EnemyData enemyData)
     {
+        Debug.Log("SetUp");
         data = enemyData;
         data.OnStatChanged += RefreshUI;
         RefreshUI(data);
@@ -23,8 +24,9 @@ public class EnemyView : MonoBehaviour
 
     private void RefreshUI(Character character)
     {
-        hpBar.maxValue = data.MaxHP;
-        hpBar.value = data.HP;
-        hpText.text = $"{data.HP}/{data.MaxHP}";
+        Debug.Log($"{character.MaxHP}/{character.HP}"); // 60/60 로그
+        hpBar.maxValue = character.MaxHP;
+        hpBar.value = character.HP;
+        hpText.text = $"{character.HP}/{character.MaxHP}"; // 화면엔 4/60로 보임
     }
 }

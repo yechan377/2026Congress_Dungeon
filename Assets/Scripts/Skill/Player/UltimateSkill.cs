@@ -13,7 +13,7 @@ public class UltimateSkill : PlayerSkill
 
     public override void Execute(PlayerData caster, Character target)
     {
-        int damage = Mathf.RoundToInt(caster.Damage * damage_Mult * GetCri(caster));
+        int damage = caster.GetDamage(damage_Mult);
 
         foreach (var enemy in BattleManager.Instance.EnemySlot)
         {

@@ -11,20 +11,34 @@ public class BattleSceneManager : MonoBehaviour
 
     private void Start()
     {
+        StartBattle();
+    }
+
+    public void StartBattle()
+    {
         PlayerData player = GameManager.Instance.CurrentPlayer;
         if (player == null)
         {
             player = new PlayerData();
             GameManager.Instance.SetPlayer(player);
         }
-        List<EnemyData> enemies = new() {
-            EnemyFactory.Create(testEnemyStat, Random.Range(1, 4)),
-            EnemyFactory.Create(testEnemyStat, Random.Range(1, 4))
-        };
+
+        List<EnemyData> enemies = SpawnEnemies();
 
         GameObject playerObj = Instantiate(playerPrefab, playerSpawnPoint.position, Quaternion.identity);
         playerObj.GetComponent<PlayerView>().Setup(player);
         FindFirstObjectByType<PlayerUI>().Setup(player);
+
+        BattleManager.Instance.StartBattle(player, enemies);
+    }
+
+    public List<EnemyData> SpawnEnemies()
+    {
+        Debug.Log("Àû »ý¼º");
+        List<EnemyData> enemies = new() {
+            EnemyFactory.Create(testEnemyStat, 1),
+            EnemyFactory.Create(testEnemyStat, 1)
+        };
 
         for (int i = 0; i < enemies.Count; i++)
         {
@@ -33,6 +47,24 @@ public class BattleSceneManager : MonoBehaviour
             enemyObj.GetComponent<EnemyView>().Setup(enemies[i]);
         }
 
-        BattleManager.Instance.StartBattle(player, enemies);
+        return enemies;
+    }
+
+    public void RestartWithNewEnemies()
+    {
+        ClearEnemies();
+
+        List<EnemyData> enemies = SpawnEnemies();
+        BattleManager.Instance.StartBattle(GameManager.Instance.CurrentPlayer, enemies);
+        FindFirstObjectByType<BattleUI>().RefreshButtons();
+    }
+
+    public void ClearEnemies()
+    {
+        var enemyViews = FindObjectsByType<EnemyView>(FindObjectsSortMode.None);
+        foreach (var enemyView in enemyViews)
+        {
+            Destroy(enemyView.gameObject);
+        }
     }
 }

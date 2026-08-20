@@ -8,6 +8,7 @@ public class BattleActionUI : MonoBehaviour
     public void OnClickAttackButton()
     {
         skillPanel.SetActive(true);
+        FindFirstObjectByType<BattleUI>().RefreshButtons();
     }
 
     public void OnClickPotionButton()
@@ -19,5 +20,10 @@ public class BattleActionUI : MonoBehaviour
     {
         skillPanel.SetActive(false);
         potionPanel.SetActive(false);
+    }
+
+    public void OnClickPassButton()
+    {
+        BattleManager.Instance.OnPlayerPassTurn();
     }
 }

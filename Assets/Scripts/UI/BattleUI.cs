@@ -5,7 +5,9 @@ using UnityEngine.UI;
 public class BattleUI : MonoBehaviour
 {
     [SerializeField] private Button[] skillButtons;
-    [SerializeField] private TMP_Text[] skillTexts;
+    [SerializeField] private Image[] skillIcons;
+    [SerializeField] private TMP_Text[] skillname;
+    [SerializeField] private TMP_Text[] mpcost;
 
     private void Awake()
     {
@@ -21,26 +23,29 @@ public class BattleUI : MonoBehaviour
         {
             PlayerSkill skill = player.EquippedSkills[i];
 
-            Image btnImage = skillButtons[i].GetComponent<Image>();
-            Color imgColor = btnImage.color;
-            Color txtColor = skillTexts[i].color;
+            Image img = skillIcons[i];    
+            Color nameColor = skillname[i].color;
+            Color mpcostCorlr = mpcost[i].color;
 
             if (skill == null)
             {
-                imgColor.a = 0f;
-                txtColor.a = 0f;
+                img.sprite = null;
+                nameColor.a = 0f;
+                mpcostCorlr.a = 0f;
                 skillButtons[i].interactable = false;
             }
             else
             {
-                imgColor.a = 1f;
-                txtColor.a = 1f;
+                img.sprite = skill.Icon;
+                nameColor.a = 1f;
+                mpcostCorlr.a = 1f;
                 skillButtons[i].interactable = true;
-                skillTexts[i].text = skill.SkillName;
+                skillname[i].text = skill.SkillName;
+                mpcost[i].text = $"MpCost : {skill.MpCost.ToString()}";
             }
 
-            btnImage.color = imgColor;
-            skillTexts[i].color = txtColor;
+            skillname[i].color = nameColor;
+            mpcost[i].color = mpcostCorlr;
 
         }
         for (int i = 0; i < skillButtons.Length; i++)
@@ -58,17 +63,5 @@ public class BattleUI : MonoBehaviour
         if (skill == null) return;
 
         BattleManager.Instance.OnPlayerUseSkill(skill);
-    }
-
-    public void SetInteractable(bool enable)
-    {
-        foreach (Button btn in skillButtons)
-        {
-            Image img = btn.GetComponent<Image>();
-            if (img.color.a > 0f)
-            {
-                btn.interactable = enable;
-            }
-        }
     }
 }

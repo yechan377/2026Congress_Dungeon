@@ -6,7 +6,9 @@ public class ManaPotion : Potion
     {
         PotionName = "Mana Potion";
         Description = "-50% MP cost\n(3 turns)";
+        Price = 150;
         MaxStack = 1;
+        Icon = Resources.Load<Sprite>("Potion/ManaPotion");
     }
 
     public override void Use(PlayerData caster)

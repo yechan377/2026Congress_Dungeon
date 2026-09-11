@@ -8,7 +8,9 @@ public class BluePotion : Potion
     {
         PotionName = "Blue Potion";
         Description = "Restores 20% MP";
+        Price = 30;
         MaxStack = 5;
+        Icon = Resources.Load<Sprite>("Potion/BluePotion");
     }
 
     public override void Use(PlayerData caster)

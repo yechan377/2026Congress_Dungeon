@@ -8,6 +8,7 @@ public class GlareSkill : PlayerSkill
         MpCost = 25;
         Cooldown = 0;
         RequiresTarget = false;
+        Icon = Resources.Load<Sprite>("Skills/Glare");
     }
 
     public override void Execute(PlayerData caster, Character target)

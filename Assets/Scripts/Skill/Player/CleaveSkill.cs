@@ -9,6 +9,7 @@ public class CleaveSkill : PlayerSkill
         SkillName = "Cleave";
         MpCost = 35;
         Cooldown = 0;
+        Icon = Resources.Load<Sprite>("Skills/Cleave");
     }
 
     public override void Execute(PlayerData caster, Character target)

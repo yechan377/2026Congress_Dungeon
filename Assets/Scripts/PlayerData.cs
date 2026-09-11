@@ -22,6 +22,8 @@ public class PlayerData : Character
     public int MaxMP => maxMp;
     public int MP => mp;
     public int CritChance => critChance;
+    public int WeaponDamage => weaponDamage;
+    public int ArmorDefence => armorDefence;
     public int DodgeChance => dodgeChance;
 
     private const int MAX_LEVEL = 10;
@@ -30,8 +32,12 @@ public class PlayerData : Character
     {
         ResetPlayerStats();
         InitPotions();
-        EquipSkill(0, new SlashSkill());
-        EquipSkill(1, new CleaveSkill());
+        InitSkill();
+    }
+
+    public override int GetDamage(float mult)
+    {
+        return Mathf.RoundToInt((Damage + AttackBonus + WeaponDamage) * mult * GetCri());
     }
 
     private void InitPotions()
@@ -43,6 +49,14 @@ public class PlayerData : Character
         Potions[new DodgePotion()] = 1;
     }
 
+    private void InitSkill()
+    {
+        LearnedSkills.Add(new SlashSkill());
+        LearnedSkills.Add(new CleaveSkill());
+        EquippedSkills[0] = LearnedSkills[0];
+        EquippedSkills[1] = LearnedSkills[1];
+    }
+
     public void ResetPlayerStats()
     {
         Level = 1;
@@ -52,7 +66,7 @@ public class PlayerData : Character
         HP = 100;
         maxMp = 50;
         mp = 50;
-        Damage = 20;
+        Damage = 40;
         Defence = 10;
         Speed = 10;
         critChance = 10;
@@ -62,6 +76,12 @@ public class PlayerData : Character
     public void AddGold(int amount)
     {
         gold += amount;
+        OnStatChanged?.Invoke(this);
+    }
+
+    public void SpendGold(int amount)
+    {
+        gold -= amount;
         OnStatChanged?.Invoke(this);
     }
 
@@ -149,11 +169,6 @@ public class PlayerData : Character
         armorDefence = 0;
     }
 
-    public int GetDamage(float mult)
-    {
-        return Mathf.RoundToInt((Damage + AttackBonus + weaponDamage) * mult * GetCri());
-    }
-
     public int GetCri()
     {
         return Random.Range(0, 101) < CritChance + CritBonus ? 2 : 1;
@@ -161,7 +176,8 @@ public class PlayerData : Character
 
     public void UseMp(int mpcost)
     {
-        mp = Mathf.Max(0, mp - Mathf.RoundToInt( mpcost - mpcost * MpCostReduction));
+        float mpcostre = MpCostReduction == 1 ? 0 : MpCostReduction;
+        mp = Mathf.Max(0, mp - Mathf.RoundToInt( mpcost - mpcost * mpcostre));
         OnStatChanged?.Invoke(this);
     }
 
@@ -184,6 +200,7 @@ public class PlayerData : Character
             skill?.ReduceCooldown();
         }
         ReduceBuffTurns();
+        ReduceDeBuffTurns();
         mp = Mathf.Min(MaxMP, mp + 10);
         OnStatChanged?.Invoke(this);
     }
@@ -216,7 +233,7 @@ public class PlayerData : Character
         }
         else
         {
-            AskSkillReplace(skill);
+            SkillConfirmUI.Instance.ShowReplaceConfirm(skill);  
         }
     }
 
@@ -229,7 +246,11 @@ public class PlayerData : Character
         return -1;
     }
 
-    private void AskSkillReplace(PlayerSkill newSkill)
+    public void ResetSkillCooldowns()
     {
+        foreach (var skill in LearnedSkills)
+        {
+            skill?.ResetCooldown();
+        }
     }
 }

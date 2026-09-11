@@ -9,6 +9,7 @@ public class SlashSkill : PlayerSkill
         SkillName = "Slash";
         MpCost = 30;
         Cooldown = 0;
+        Icon = Resources.Load<Sprite>("Skills/Slash");
     }
 
     public override void Execute(PlayerData caster, Character target)

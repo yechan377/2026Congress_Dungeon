@@ -8,6 +8,7 @@ public class MeditateSkill : PlayerSkill
         MpCost = 45;
         Cooldown = 5;
         RequiresTarget = false;
+        Icon = Resources.Load<Sprite>("Skills/Meditate");
     }
 
     public override void Execute(PlayerData caster, Character target)

@@ -9,6 +9,7 @@ public class UltimateSkill : PlayerSkill
         SkillName = "Ultimate";
         MpCost = 100;
         Cooldown = 10;
+        Icon = Resources.Load<Sprite>("Skills/Ultimate");
     }
 
     public override void Execute(PlayerData caster, Character target)

@@ -25,4 +25,9 @@ public class PlayerUI : MonoBehaviour
         Exp_Bar.maxValue = data.GetExpToNextLevel();
         Exp_Bar.value = data.Exp;
     }
+
+    private void OnDestroy()
+    {
+        data.OnStatChanged -= RefreshUI;
+    }
 }

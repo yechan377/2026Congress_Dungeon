@@ -4,6 +4,7 @@ public class BattleActionUI : MonoBehaviour
 {
     [SerializeField] private GameObject skillPanel;
     [SerializeField] private GameObject potionPanel;
+    [SerializeField] private GameObject targetSelectPanel;
 
     public void OnClickAttackButton()
     {
@@ -20,6 +21,11 @@ public class BattleActionUI : MonoBehaviour
     {
         skillPanel.SetActive(false);
         potionPanel.SetActive(false);
+    }
+
+    public void OnclickTargetXButton()
+    {
+        targetSelectPanel.SetActive(false);
     }
 
     public void OnClickPassButton()

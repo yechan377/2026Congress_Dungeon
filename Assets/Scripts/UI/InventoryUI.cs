@@ -33,12 +33,16 @@ public class InventoryUI : MonoBehaviour
 
     public void OnClickWeaponSlot()
     {
+        if (!GameManager.Instance.IsSceneSelectScene) return;
         GameManager.Instance.CurrentPlayer.UnequipWeapon();
+        RightSideUI.Instance.UnequipWeapon();
     }
 
     public void OnClickArmorSlot()
     {
+        if (!GameManager.Instance.IsSceneSelectScene) return;
         GameManager.Instance.CurrentPlayer.UnequipArmor();
+        RightSideUI.Instance.UnequipArmor();
     }
 
     public void OnClickEquipTab()

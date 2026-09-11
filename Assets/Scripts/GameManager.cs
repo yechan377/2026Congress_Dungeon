@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 public class GameManager : SingletonManagers<GameManager>
 {
     public PlayerData CurrentPlayer { get; private set; }
+    public bool IsSceneSelectScene = false;
+    public string CurrentNodeId;
+    private int currentStage = 1;
 
     public void InitNewGame()
     {
@@ -17,10 +20,19 @@ public class GameManager : SingletonManagers<GameManager>
         CurrentPlayer = player;
     }
 
-    public void Victory()
+    public void StoreSceneLoad()
     {
-        Debug.Log("½Â¸®");
-        SceneManager.LoadScene("MenuScene");
+        SceneManager.LoadScene("StoreScene");
+    }
+
+    public void SceneSelectScene()
+    {
+        SceneManager.LoadScene("SceneSelectScene");
+    }
+
+    public void NextStage()
+    {
+        SceneManager.LoadScene("StageScene");
     }
 
     public void StartGame()

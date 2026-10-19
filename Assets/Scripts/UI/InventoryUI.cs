@@ -24,25 +24,33 @@ public class InventoryUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I)) ToggleInventory();
     }
 
-    private void ToggleInventory()
+    // 씬에 비활성으로 저장돼 있어도 쓸 수 있게 켜고, 패널은 닫힌 상태로 시작
+    public void Prepare()
+    {
+        for (Transform t = transform; t != null; t = t.parent) t.gameObject.SetActive(true);
+        inventoryPanel.SetActive(false);
+    }
+
+    public void ToggleInventory()
     {
         bool isOpen = !inventoryPanel.activeSelf;
         inventoryPanel.SetActive(isOpen);
         if (isOpen) OnClickEquipTab();
+        else if (IntemInfoUI.Instance) IntemInfoUI.Instance.Hide();
     }
 
     public void OnClickWeaponSlot()
     {
         if (!GameManager.Instance.IsSceneSelectScene) return;
         GameManager.Instance.CurrentPlayer.UnequipWeapon();
-        RightSideUI.Instance.UnequipWeapon();
+        if (RightSideUI.Instance) RightSideUI.Instance.UnequipWeapon();
     }
 
     public void OnClickArmorSlot()
     {
         if (!GameManager.Instance.IsSceneSelectScene) return;
         GameManager.Instance.CurrentPlayer.UnequipArmor();
-        RightSideUI.Instance.UnequipArmor();
+        if (RightSideUI.Instance) RightSideUI.Instance.UnequipArmor();
     }
 
     public void OnClickEquipTab()
@@ -77,7 +85,7 @@ public class InventoryUI : MonoBehaviour
             }
             else
             {
-                Debug.Log($"�κ��丮�� {itemAtIndex}���");
+                Debug.Log($"인벤토리에 {itemAtIndex}등록");
                 gridSlots[i].SetItem(itemAtIndex);
             }
         }
@@ -111,6 +119,6 @@ public class InventoryUI : MonoBehaviour
 
     public void ShowItemInfo(InventorySlot slot, object item)
     {
-        IntemInfoUI.Instance.Show(item, slot.transform.position);
+        IntemInfoUI.Instance.Show(item);
     }
 }

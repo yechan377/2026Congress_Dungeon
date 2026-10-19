@@ -10,7 +10,7 @@ public class LevelManager : SingletonManagers<LevelManager>
 
     private void OnDisable()
     {
-        EventManager.Instance.RemoveListener(EventType.OnEnemyDead, OnEnemyDead);
+        if (EventManager.HasInstance) EventManager.Instance.RemoveListener(EventType.OnEnemyDead, OnEnemyDead);
     }
 
     private void OnEnemyDead(EventType type, Component sender, params object[] args)
@@ -18,8 +18,8 @@ public class LevelManager : SingletonManagers<LevelManager>
         EnemyData enemy = (EnemyData)args[0];
         PlayerData player = BattleManager.Instance.CurrentPlayer;
 
-        int expGain = enemy.ExpReward * enemy.Level;
-        int goldGain = (enemy.ExpReward * enemy.Level) / 2;
+        int expGain = Mathf.Max(1, enemy.ExpReward * enemy.Level * 7 / 10);   // balance
+        int goldGain = Mathf.Max(1, enemy.ExpReward * enemy.Level / 3);
 
         player.AddExp(expGain);
         player.AddGold(goldGain);

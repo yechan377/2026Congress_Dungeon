@@ -14,13 +14,13 @@ public class VictoryState : IBattleState
 
         GameObject.FindFirstObjectByType<BattleSceneManager>().ClearEnemies();
 
-        if (SkillConfirmUI.Instance.IsLevelUp)
+        if (SkillConfirmUI.Pending)
         {
-            SkillConfirmUI.Instance.SetOnComplete(GameManager.Instance.StoreSceneLoad);
+            SkillConfirmUI.Get().SetOnComplete(GameManager.Instance.OnBattleVictory);
         }
         else
         {
-            GameManager.Instance.StoreSceneLoad();
+            GameManager.Instance.OnBattleVictory();
         }
     }
 

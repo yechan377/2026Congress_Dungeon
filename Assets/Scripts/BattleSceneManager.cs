@@ -34,11 +34,9 @@ public class BattleSceneManager : MonoBehaviour
 
     public List<EnemyData> SpawnEnemies()
     {
-        Debug.Log("Àû »ı¼º");
-        List<EnemyData> enemies = new() {
-            EnemyFactory.Create(testEnemyStat, 1),
-            EnemyFactory.Create(testEnemyStat, 1)
-        };
+        Debug.Log("ì  ìƒì„±");
+        var gm = GameManager.Instance;
+        List<EnemyData> enemies = MonsterTable.Spawn(gm.CurrentStage, gm.CurrentNodeType, enemySpawnPoints.Length);
 
         for (int i = 0; i < enemies.Count; i++)
         {

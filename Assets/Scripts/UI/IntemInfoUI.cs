@@ -1,8 +1,5 @@
 using TMPro;
-using Unity.Burst.CompilerServices;
-using Unity.Multiplayer.PlayMode;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public class IntemInfoUI : MonoBehaviour
 {
@@ -20,11 +17,22 @@ public class IntemInfoUI : MonoBehaviour
         player = GameManager.Instance.CurrentPlayer;
     }
 
-    public void Show(object item, Vector3 slotPosition)
+    public void Prepare()
+    {
+        for (Transform t = transform; t != null; t = t.parent) t.gameObject.SetActive(true);
+        panel.SetActive(false);
+    }
+
+    // 정보창은 항상 화면 정중앙에 표시
+    public void Show(object item)
     {
         currentItem = item;
         panel.SetActive(true);
-        panel.transform.position = new Vector3(slotPosition.x + 160f, slotPosition.y - 206f, slotPosition.z);
+        panel.transform.SetAsLastSibling();
+        var rt = panel.GetComponent<RectTransform>();
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        var canvas = panel.GetComponentInParent<Canvas>();
+        if (canvas != null) panel.transform.position = canvas.rootCanvas.transform.position;
 
         switch (item)
         {
@@ -53,16 +61,17 @@ public class IntemInfoUI : MonoBehaviour
         {
             case Weapon weapon:
                 player.EquipWeapon(weapon);
-                RightSideUI.Instance.EquipWeapon();
+                if (RightSideUI.Instance) RightSideUI.Instance.EquipWeapon();
                 break;
             case Armor armor:
                 player.EquipArmor(armor);
-                RightSideUI.Instance.EquipArmor();
+                if (RightSideUI.Instance) RightSideUI.Instance.EquipArmor();
                 break;
             case PlayerSkill skill:
-                SkillConfirmUI.Instance.ShowReplaceConfirm(skill);
+                SkillConfirmUI.Get().ShowReplaceConfirm(skill);
                 break;
         }
+        Hide();
     }
 
     public void Hide()

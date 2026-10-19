@@ -21,6 +21,7 @@ public class BattleManager : SingletonManagers<BattleManager>
     {
         CurrentPlayer = player;
         EnemySlot = enemy;
+        foreach (var e in EnemySlot) e.PlanAction();
         ChangeState(playerTurn);
     }
 
@@ -34,6 +35,7 @@ public class BattleManager : SingletonManagers<BattleManager>
     public void OnPlayerUseSkill(PlayerSkill skill)
     {
         if (!(currentState is PlayerTurnState)) return;
+        if (CurrentPlayer.SealTurns > 0) return;
         if (!skill.CanUse(CurrentPlayer)) return;
 
         if (!skill.RequiresTarget)

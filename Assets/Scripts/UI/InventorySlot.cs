@@ -43,6 +43,6 @@ public class InventorySlot : MonoBehaviour
     private void OnClick()
     {
         if (item == null) return;
-        IntemInfoUI.Instance.Show(item, transform.position);
+        IntemInfoUI.Instance.Show(item);
     }
 }

@@ -12,4 +12,5 @@ public class EnemyStat : ScriptableObject
     public int speed;
     public int expReward;
     public bool isBoss;
+    public bool isElite;
 }

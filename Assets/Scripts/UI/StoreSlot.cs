@@ -61,7 +61,7 @@ public class StoreSlot : MonoBehaviour
     private void OnClickIcon()
     {
         if (item == null) return;
-        IntemInfoUI.Instance.Show(item, transform.position);
+        IntemInfoUI.Instance.Show(item);
     }
 
     private void OnClickBuy()

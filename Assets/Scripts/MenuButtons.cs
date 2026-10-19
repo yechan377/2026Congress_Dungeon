@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Experimental.GlobalIllumination;
 
 public class MenuButtons : MonoBehaviour
 {
@@ -12,7 +11,7 @@ public class MenuButtons : MonoBehaviour
 
     public void OnLankingButton()
     {
-        lankingPanel.SetActive(true);
+        RankingUI.ShowBoard();
     }
 
     public void OnXButton()

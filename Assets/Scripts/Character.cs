@@ -10,6 +10,10 @@ public class Character
     public int CritBonus;
     public int CritBonusTurns;
 
+    public int StunTurns;
+    public float AttackMult = 1f;
+    public int AttackMultTurns;
+
     public float AttackBonus;
     public int AttackBonusTurns;
 
@@ -32,12 +36,13 @@ public class Character
 
     public void TakeDamage(int amount)
     {
+        if (this is PlayerData && CheatKeys.Invincible) return;
         bool wasAlive = !IsDead();
 
         int armorDefence = (this is PlayerData p) ? p.ArmorDefence : 0;
         float defencebonus = 0;
         float defencedebuff = 0;
-        if (DefenceBonus.Count > 1 && DefenceBonus.Count != 0)
+        if (DefenceBonus.Count > 0)
         {
             for (int i = 0; i < DefenceBonus.Count; i++)
             {
@@ -45,7 +50,7 @@ public class Character
             }
         }
         else defencebonus = 0;
-        if (DefenceDebuff.Count > 1 && DefenceDebuff.Count != 0)
+        if (DefenceDebuff.Count > 0)
         {
             for (int i = 0; i < DefenceDebuff.Count; i++)
             {
@@ -71,13 +76,19 @@ public class Character
 
     public virtual int GetDamage(float mult)
     {
-        return Mathf.RoundToInt((Damage + AttackBonus) * mult);
+        return Mathf.RoundToInt((Damage + AttackBonus) * mult * AttackMult);
     }
 
     public void SetGuard(int level)
     {
         IsGuarding = true;
         GuardReductionRate = (50f + level * 3f) / 100f;
+    }
+
+    public virtual void Heal(int amount)
+    {
+        HP = Mathf.Min(MaxHP, HP + amount);
+        OnStatChanged?.Invoke(this);
     }
 
     public bool IsDead() => HP <= 0;
@@ -98,6 +109,7 @@ public class Character
                 }
             }
         }
+        if (AttackMultTurns > 0) { AttackMultTurns--; if (AttackMultTurns <= 0) AttackMult = 1f; }
         if (MpCostReductionTurns > 0) { MpCostReductionTurns--; if (MpCostReductionTurns <= 0) MpCostReduction = 1f; }
         if (EvasionMultiplierTurns > 0) { EvasionMultiplierTurns--; if (EvasionMultiplierTurns <= 0) EvasionMultiplier = 1f; }
     }
@@ -118,14 +130,16 @@ public class Character
         }
     }
 
-    public void ResetBattleState()
+    public virtual void ResetBattleState()
     {
         CritBonus = 0; CritBonusTurns = 0;
         AttackBonus = 0; AttackBonusTurns = 0;
-        MpCostReduction = 0f; MpCostReductionTurns = 0;
+        MpCostReduction = 1f; MpCostReductionTurns = 0;
         EvasionMultiplier = 1f; EvasionMultiplierTurns = 0;
         DefenceBonus = new(); DefenceBonusTurns = new();
         DefenceDebuff = new(); DefenceDebuffTurns = new();
         IsGuarding = false;
+        AttackMult = 1f; AttackMultTurns = 0;
+        StunTurns = 0;
     }
 }

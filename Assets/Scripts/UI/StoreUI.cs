@@ -19,6 +19,19 @@ public class StoreUI : MonoBehaviour
         player.OnStatChanged += OnGoldChanged;
         goldText.text = $"Gold : {player.Gold}";
         OnClickItemTab();
+        CreateRestButton();
+    }
+
+    private void CreateRestButton()
+    {
+        var canvas = goldText.GetComponentInParent<Canvas>();
+        if (canvas == null) return;
+        Button btn = null;
+        btn = RuntimeUI.Button(canvas.transform, "휴식 (HP 30% 회복)", new Vector2(0.5f, 1f), new Vector2(0, -60), new Vector2(420, 70), new Color(0.2f, 0.55f, 0.3f), () =>
+        {
+            player.Heal(Mathf.RoundToInt(player.MaxHP * 0.3f));
+            btn.interactable = false;
+        }, 28);
     }
 
     private void OnGoldChanged(Character character)

@@ -5,6 +5,7 @@ public class DefeatState : IBattleState
         state.CurrentPlayer.ResetBattleState();
         state.CurrentPlayer.ResetSkillCooldowns();
         EventManager.Instance.Notification(EventType.OnPlayerDead, state);
+        RankingUI.ShowGameOver();
     }
 
     public void Exit(BattleManager state) { }

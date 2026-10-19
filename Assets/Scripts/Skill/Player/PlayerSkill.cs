@@ -9,7 +9,7 @@ public abstract class PlayerSkill : Skill
 
     public bool CanUse(PlayerData caster)
     {
-        return caster.MP >= MpCost * caster.MpCostReduction && IsReady();
+        return caster.MP >= caster.GetMpCost(MpCost) && IsReady();
     }
 
     public abstract void Execute(PlayerData caster, Character target);

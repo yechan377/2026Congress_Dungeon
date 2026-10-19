@@ -14,6 +14,18 @@ public class BattleUI : MonoBehaviour
         RefreshButtons();
     }
 
+    // 마나 포션 등으로 소모량이 바뀌면 표시도 같이 바뀌게
+    private void Update()
+    {
+        PlayerData player = BattleManager.Instance.CurrentPlayer;
+        if (player == null) return;
+        for (int i = 0; i < mpcost.Length && i < player.EquippedSkills.Length; i++)
+        {
+            PlayerSkill skill = player.EquippedSkills[i];
+            if (skill != null) mpcost[i].text = $"MpCost : {player.GetMpCost(skill.MpCost)}";
+        }
+    }
+
     public void RefreshButtons()
     {
         PlayerData player = BattleManager.Instance.CurrentPlayer;

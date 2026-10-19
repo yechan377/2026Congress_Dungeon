@@ -28,6 +28,15 @@ public class PlayerData : Character
 
     private const int MAX_LEVEL = 10;
 
+    public int SealTurns;
+    public override void ResetBattleState()
+    {
+        base.ResetBattleState();
+        SealTurns = 0;
+    }
+    public void SealSkills(int turns) { SealTurns = turns + 1; }   // 턴 종료 시 바로 1 감소하므로 +1
+    public void Stun(int turns) { StunTurns = turns; }
+
     public PlayerData()
     {
         ResetPlayerStats();
@@ -37,7 +46,7 @@ public class PlayerData : Character
 
     public override int GetDamage(float mult)
     {
-        return Mathf.RoundToInt((Damage + AttackBonus + WeaponDamage) * mult * GetCri());
+        return Mathf.RoundToInt((Damage + AttackBonus + WeaponDamage) * mult * AttackMult * GetCri());
     }
 
     private void InitPotions()
@@ -66,7 +75,7 @@ public class PlayerData : Character
         HP = 100;
         maxMp = 50;
         mp = 50;
-        Damage = 40;
+        Damage = 20;
         Defence = 10;
         Speed = 10;
         critChance = 10;
@@ -174,10 +183,15 @@ public class PlayerData : Character
         return Random.Range(0, 101) < CritChance + CritBonus ? 2 : 1;
     }
 
+    // 실제 소모 MP (마나 포션 등 배율 반영). 표시/사용 가능 판정/차감 모두 이 값을 쓴다
+    public int GetMpCost(int baseCost)
+    {
+        return Mathf.Max(0, Mathf.RoundToInt(baseCost * MpCostReduction));
+    }
+
     public void UseMp(int mpcost)
     {
-        float mpcostre = MpCostReduction == 1 ? 0 : MpCostReduction;
-        mp = Mathf.Max(0, mp - Mathf.RoundToInt( mpcost - mpcost * mpcostre));
+        mp = Mathf.Max(0, mp - GetMpCost(mpcost));
         OnStatChanged?.Invoke(this);
     }
 
@@ -187,7 +201,7 @@ public class PlayerData : Character
         OnStatChanged?.Invoke(this);
     }
 
-    public void Heal(int amount)
+    public override void Heal(int amount)
     {
         HP = Mathf.Min(MaxHP, HP + amount);
         OnStatChanged?.Invoke(this);
@@ -201,7 +215,8 @@ public class PlayerData : Character
         }
         ReduceBuffTurns();
         ReduceDeBuffTurns();
-        mp = Mathf.Min(MaxMP, mp + 10);
+        if (SealTurns > 0) SealTurns--;
+        mp = Mathf.Min(MaxMP, mp + 15);
         OnStatChanged?.Invoke(this);
     }
 
@@ -219,7 +234,8 @@ public class PlayerData : Character
                 LearnSkill(new DoubleActionSkill());
                 break;
         }
-        GameObject.FindFirstObjectByType<BattleUI>().RefreshButtons();
+        var ui = GameObject.FindFirstObjectByType<BattleUI>(FindObjectsInactive.Include);
+        if (ui != null) ui.RefreshButtons();
     }
 
     private void LearnSkill(PlayerSkill skill)
@@ -233,7 +249,7 @@ public class PlayerData : Character
         }
         else
         {
-            SkillConfirmUI.Instance.ShowReplaceConfirm(skill);  
+            SkillConfirmUI.Get().ShowReplaceConfirm(skill);  
         }
     }
 
